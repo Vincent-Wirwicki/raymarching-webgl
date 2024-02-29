@@ -6,4 +6,5 @@ export const navPaths = [
 export const navPathBasics = [
   { title: "transforms", path: "/basic/transform" },
   { title: "displace", path: "/basic/displace" },
+  { title: "shadows", path: "/basic/shadows" },
 ];
