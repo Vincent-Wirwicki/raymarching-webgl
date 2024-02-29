@@ -1,7 +1,27 @@
+import { Link, useLocation } from "react-router-dom";
+import { navPaths } from "../../navPath";
+
 const MainNav = () => {
+  const location = useLocation();
+  const filter = location.pathname.split("/")[1];
+
   return (
-    <nav className="fixed top-0 left-0 h-screen w-20 border-r border-neutral-800 z-50 p-2">
-      <h1>Raymarching</h1>
+    <nav className="nav nav-main">
+      {navPaths.map(({ title, path }, i) => (
+        <Link
+          key={i}
+          to={path}
+          className="link"
+          style={{
+            color:
+              title === filter || (title === "home" && filter === "")
+                ? "#3b82f6"
+                : "#64748b",
+          }}
+        >
+          {title}
+        </Link>
+      ))}
     </nav>
   );
 };

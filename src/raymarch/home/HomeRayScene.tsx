@@ -1,10 +1,9 @@
 import { lazy, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-// import BasicRayMesh from "./BasicRayMesh";
 
-const BasicRayMesh = lazy(() => import("./BasicRayMesh"));
+const BasicRayMesh = lazy(() => import("./HomeRaymarchMesh"));
 
-const BasicRayScene = () => {
+const HomeRayScene = () => {
   return (
     <Canvas>
       <Suspense fallback={null}>
@@ -14,4 +13,4 @@ const BasicRayScene = () => {
   );
 };
 
-export default BasicRayScene;
+export default HomeRayScene;

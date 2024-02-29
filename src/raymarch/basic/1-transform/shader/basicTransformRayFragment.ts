@@ -1,6 +1,6 @@
 // details here => https://iquilezles.org/articles/menger/
 
-export const basicRayFragment = /* glsl */ `
+export const basicTransformRayFragment = /* glsl */ `
      
     uniform float uTime;
     uniform vec2 uResolution;
@@ -123,12 +123,8 @@ export const basicRayFragment = /* glsl */ `
     //--------------------------------------------------  
     float scene(vec3 p){
         vec3 q  = p;
-        float a = 3.;
-
-        float displacement = sin(a*p.y) * cos(a*p.x) * sin(a*p.y) *0.25 * sin(uTime);
-        float noize = noise(p.xyx  + sin(uTime));
-        vec3 pBox =p-vec3(0.,0.,1.) + displacement ;
-        vec3 pSphere = p-vec3(0.,abs(sin(uTime)),1.) + noize  ;
+        float a = 5.;
+        float displacement = sin(a*p.x*p.z*p.y) * 0.5 * sin(uTime);
         
         //mirror
         q.xy = abs(q.xy);
@@ -136,25 +132,18 @@ export const basicRayFragment = /* glsl */ `
 
         //rotate
         q.yz *= rotate2d(q.x + (uTime));
-        pBox.yx *= rotate2d(pBox.x *0.5 + sin(uTime));
-
-        float s = sdSphere(pSphere,1.);
-        float b = sdBox(pBox ,vec3(.5));
-        float sb = smoothmin(s,b,0.8);
-
-        // float s = sdSphere(pSphere,1.);
-        // float b = sdBox(pBox ,vec3(.5));
-        // float sb = smoothmin(s,b,0.8);
-
         
-        float d = sdBox(q, vec3(.5)) ;
-        float d1 = sdBox(q - vec3(cos(uTime), sin(uTime),0.) , vec3(0.4));
-        float d2 = sdSphere(q - vec3(cos(uTime),0.,0.),  0.4);
+        float s = sdSphere(p,1.) + displacement;
         
-        float dd1 = smoothmin(d,d1,0.8);
-        float dd2 = smoothmin(dd1, d2,0.2);
+        float b1 = sdBox(q, vec3(.5)) ;
+        float b2 = sdBox(q - vec3(cos(uTime), sin(uTime),0.) , vec3(0.4));
+        float s2 = sdSphere(q - vec3(cos(uTime),0.,0.),  0.4);
         
-        d = smoothmin(dd2, sb,0.5);
+        float r = smoothmin(b1,b2,0.8);
+        float r2 = smoothmin(r,s2,0.2);
+        
+        float d = smoothmin(r2, s, 0.5);
+        
         return d;
     }
     //--------------------------------------------------

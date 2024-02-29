@@ -1,6 +1,6 @@
 // code from https://www.youtube.com/watch?v=PGtv-dBi2wE
 
-export const basicFragment = /* glsl */ `
+export const basicDisplaceFragment = /* glsl */ `
      
     uniform float uTime;
     uniform vec2 uResolution;
@@ -35,9 +35,8 @@ export const basicFragment = /* glsl */ `
     }
     //--------------------------------------------------
   
-
-    //--------------------------------------------------
-    // VEC3 NOISE TO RANDOMIZE POSITION
+   //--------------------------------------------------
+    // VEC3 NOISE TO PSEUDO RANDOMIZE POSITION
     //--------------------------------------------------  
     float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
     vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
@@ -71,18 +70,20 @@ export const basicFragment = /* glsl */ `
     // RAYMARCH SCENE - RENDER LOGIC
     //-------------------------------------------------- 
     float sdScene(vec3 pos){
+        // float d = sdSphere(pos-vec3(0.0, 0.0, 1.0), 3.0);
+        // float time = sin(time) + cos(uTime);
+        // float displacement = sin(5.0 * pos.x) * sin(5.0 * pos.y) * sin(5.0 * pos.z) * 1.5;
+        float radius = 0.15;
+        float noisy = noise(pos.zyy   + uTime *0.5);
+        float noisy2 = noise(vec3(pos.yyx + uTime *0.25)) ;
 
-        float radius = 0.45;
-        float noisy = noise(pos.zxx   + uTime *0.5);
-        float noisy2 = noise(vec3(pos.yyz + uTime *0.5));
+        float sphere =  sdSphere(pos + vec3(1. -cos(noisy2 *1.75 )  ,1.- sin(noisy * 1.75), 0. ), radius);
 
-        float sphere =  sdSphere(pos + vec3(sin(noisy2+0.5),0., 0. ) + noisy, radius);
+        float sphere2 = sdSphere(pos + vec3(cos(noisy *2.25), sin(2.25 * noisy2), 0. ), radius);
 
-        float sphere2 = sdSphere(pos + vec3(0., sin(2.25 * noisy2 +0.5), 0. ), radius);
+        float sphere3 = sdSphere(pos + vec3(cos(noisy2 * 2.), sin(noisy *2.) , 0.), radius); 
 
-        float sphere3 = sdSphere(pos + vec3(0., sin(noisy *2.) , 0.) + noisy2, radius); 
-
-        float sphere4 = sdSphere(pos + vec3(sin(noisy *2.25 +0.5),0., 0.), radius);
+        float sphere4 = sdSphere(pos + vec3(1.-cos(noisy *2.5 ),1.- sin(noisy2 *2.5), 0.), radius);
 
         float render1 = smoothmin(sphere, sphere2 , 0.8);
         float render2 = smoothmin(sphere3, sphere4, 0.8);
@@ -130,44 +131,6 @@ export const basicFragment = /* glsl */ `
     }
     //--------------------------------------------------
 
-    //-------------------------------------------------- 
-    // CALC DIFFUSE LIGHT
-    //--------------------------------------------------  
-    float addLights (vec3 p, vec3 lightPos){
-        vec3 nLight = normalize(lightPos - p);
-        vec3 nPos = getNormal(p);
-        float diffuseLight = max(dot(nPos, nLight),0.);
-        return diffuseLight;
-
-    }
-    //--------------------------------------------------  
-
-    //--------------------------------------------------
-    // CALC SOFT SHADOWS
-    //-------------------------------------------------- 
-    float softshadow( in vec3 ro, in vec3 rd, float mint, float maxt, float w ) {
-        float res = 1.0;
-        float t = mint;
-        for( int i=0; i<256 && t<maxt; i++ )
-        {
-            float h = sdScene(ro + t*rd);
-            res = min( res, h/(w*t) );
-            t += clamp(h, 0.005, 0.50);
-            if( res<-1.0 || t>maxt ) break;
-        }
-        res = max(res,-1.0);
-        return 0.25*(1.0+res)*(1.0+res)*(2.0-res);
-    }
-    //--------------------------------------------------
-
-    //--------------------------------------------------
-    // CALC COLOR PALETTE
-    //-------------------------------------------------- 
-    vec3 palette( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d ){
-        return a + b*cos( 6.28318*(c*t+d) );
-    }
-    //--------------------------------------------------
-
     //--------------------------------------------------
     // RENDER
     //-------------------------------------------------- 
@@ -189,11 +152,9 @@ export const basicFragment = /* glsl */ `
         // ---------------------------------------------
         
         // light position-------------------------------
-        // vec3 lightPos = vec3(abs(cos(uTime*0.5)) + 10.,  abs(sin(uTime*0.5)) +10.,15.0);
-        vec3 lightPos = vec3(0.,10.,15.0);
+        vec3 lightPos = vec3( 10.,  sin(uTime*0.5) +10.,15.0);
         // ---------------------------------------------
-
-
+        
         vec3 color = vec3(0., 0., 0.);
         
         //if ray hit-----------------------------------
@@ -201,14 +162,7 @@ export const basicFragment = /* glsl */ `
             vec3 nPos = getNormal(p);
             vec3 lightDir = normalize(lightPos - nPos);
             float diffuse = max(dot(nPos, lightDir),0.);
-            float shadows = softshadow(p, lightDir, 0.01, 5.,64.);
-
-            // float diffuse = addLights(p, lightPosition);
-            // float shadows = softshadow(rayOrigin, p, 0.1,5.,50.);
-            float n = noise(p + sin(uTime) * cos(uTime));
-            // float test = diffuse * shadows * n;
-            vec3 color1 = palette(n + shadows, vec3(1.,0.,0.), vec3(.0), vec3(.5), vec3(0.5, 0., 0.));
-            color = vec3(color1) *diffuse * shadows  ;
+            color = vec3(nPos) *diffuse   ;
         };
         // ---------------------------------------------
 
@@ -217,18 +171,3 @@ export const basicFragment = /* glsl */ `
 
     }
 `;
-
-// float sphere =  sdSphere(pos + vec3(noisy *2., 0.,1.- noisy ), radius);
-
-// float sphere2 = sdSphere(pos + vec3(noisy, 0.15 * noisy, 0.), radius);
-
-// float sphere3 = sdSphere(pos + vec3(noisy * noisy - 0.156, 0.15 + noisy, 0.),radius);
-
-// float sphere4 = sdSphere(pos + vec3(noisy,0., noisy + noisy), radius);
-
-// float mNoise = mix(pos.y, noisyY, 0.1);
-// float sphere =  sdSphere(pos - vec3(cos(uTime*0.5)*0.742, sin(uTime *.5), 0.), 0.15);
-// float sphere2 = sdSphere(pos - vec3(1.-cos(uTime*0.5)*.124, 1.-sin(uTime *.5),0.), 0.15);
-// float sphere3 = sdSphere(pos - vec3(sin(uTime*.5 )*0.895, cos(uTime *.5), 0.), 0.15);
-// float sphere4 = sdSphere(pos - vec3(1.-cos(uTime*0.5) + 0.217, 1.-cos(uTime *.5),0.), 0.15);
-// float sphere5 = sdSphere(pos - vec3(cos(uTime*0.5),0.,0.), 0.2);

@@ -1,19 +1,21 @@
-import BasicRayScene from "./raymarch/basic/1-pink-blue/BasicRayScene";
-import BasicRedRayScene from "./raymarch/basic/2-red/BasicRedRayScene";
-import MainNav from "./layout/nav/MainNav";
+import BasicTransformRayScene from "./raymarch/basic/1-transform/BasicTransformRayScene";
+import BasicDisplaceRayScene from "./raymarch/basic/2-displace/BasicDisplaceRayScene";
+import HomePage from "./pages/home/HomePage";
 import { Route, Routes } from "react-router-dom";
+import Layout from "./layout/Layout";
+import BasicsPage from "./pages/basic/BasicsPage";
 
 const App = () => {
   return (
     <>
-      <MainNav />
-      <main className="w-screen h-screen">
-        <Routes>
-          <Route index path="/" />
-          <Route path="/basic" element={<BasicRayScene />} />
-          <Route path="/basic-red" element={<BasicRedRayScene />} />
-        </Routes>
-      </main>
+      <Layout />
+      <Routes>
+        <Route index element={<HomePage />} />
+        <Route path="/basic" element={<BasicsPage />}>
+          <Route path="/basic/transform" element={<BasicTransformRayScene />} />
+          <Route path="/basic/displace" element={<BasicDisplaceRayScene />} />
+        </Route>
+      </Routes>
     </>
   );
 };

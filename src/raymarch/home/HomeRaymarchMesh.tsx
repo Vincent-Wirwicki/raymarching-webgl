@@ -3,10 +3,10 @@ import { ShaderMaterial, Vector2 } from "three";
 import { useFrame } from "@react-three/fiber";
 import { useAspect } from "@react-three/drei";
 
-import { defaultVertex } from "./shader/defaultVertex";
-import { basicRayFragment } from "./shader/basicRayFragment";
+import { vertex } from "../1-utis/vertex";
+import { homeRayFragment } from "./shader/homeRayFragment";
 
-const BasicRayMesh = () => {
+const HomeRaymarchMesh = () => {
   const scale = useAspect(window.innerWidth, window.innerHeight, 1);
   const shaderRef = useRef<ShaderMaterial | null>(null);
 
@@ -19,8 +19,8 @@ const BasicRayMesh = () => {
           value: new Vector2(),
         },
       },
-      vertex: defaultVertex,
-      fragment: basicRayFragment,
+      vertex: vertex,
+      fragment: homeRayFragment,
     }),
     []
   );
@@ -51,4 +51,4 @@ const BasicRayMesh = () => {
   );
 };
 
-export default BasicRayMesh;
+export default HomeRaymarchMesh;

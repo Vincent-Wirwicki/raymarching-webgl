@@ -2,11 +2,11 @@ import { useMemo, useRef } from "react";
 import { ShaderMaterial, Vector2 } from "three";
 import { useFrame } from "@react-three/fiber";
 
-import { defaultVertex } from "./shader/defaultVertex";
-import { basicFragment } from "./shader/basicFragment";
+import { vertex } from "../../1-utis/vertex";
+import { basicDisplaceFragment } from "./shader/basicFragment";
 import { useAspect } from "@react-three/drei";
 
-const BasicRedRayShaderMesh = () => {
+const BasicDisplaceRayShaderMesh = () => {
   const scale = useAspect(window.innerWidth, window.innerHeight, 1);
   const shaderRef = useRef<ShaderMaterial | null>(null);
 
@@ -19,8 +19,8 @@ const BasicRedRayShaderMesh = () => {
           value: new Vector2(),
         },
       },
-      vertex: defaultVertex,
-      fragment: basicFragment,
+      vertex: vertex,
+      fragment: basicDisplaceFragment,
     }),
     []
   );
@@ -51,4 +51,4 @@ const BasicRedRayShaderMesh = () => {
   );
 };
 
-export default BasicRedRayShaderMesh;
+export default BasicDisplaceRayShaderMesh;

@@ -1,4 +1,4 @@
-export const vertext = /* glsl */ `
+export const vertex = /* glsl */ `
     uniform float uTime;
     varying vec3 vPosition;
     varying vec2 vUv;
