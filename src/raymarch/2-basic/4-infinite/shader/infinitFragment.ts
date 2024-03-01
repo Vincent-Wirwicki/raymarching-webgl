@@ -1,6 +1,6 @@
 // details here => https://iquilezles.org/articles/menger/
 
-export const shadowsRayFragment = /* glsl */ `
+export const infinitFragment = /* glsl */ `
      
     uniform float uTime;
     uniform vec2 uResolution;
@@ -12,8 +12,6 @@ export const shadowsRayFragment = /* glsl */ `
     #define M_PI 3.14159265
     #define inf 1e10
     
-
-
     //--------------------------------------------------
     // SDF 3D SHAPES 
     // https://iquilezles.org/articles/distfunctions/
@@ -27,59 +25,50 @@ export const shadowsRayFragment = /* glsl */ `
         return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
     }
 
-    float sdOctahedron( vec3 p, float s){
-      p = abs(p);
-      return (p.x+p.y+p.z-s)*0.57735027;
+    vec3 repeat(vec3 p, float c) {
+        return mod(p,c) - 0.5 * c; // (0.5 *c centers the tiling around the origin)
     }
 
-    float sdBox2d( in vec2 p, in vec2 b ){
-        vec2 d = abs(p)-b;
-        return length(max(d,0.0)) + min(max(d.x,d.y),0.0);
+    float sdCross (vec3 p, float d1, float d2 ){
+        float b1 = sdBox(p, vec3(0.8,0.5,.5));
+        float b2 = sdBox(p, vec3(0.5,d1,0.5));
+        float b3 = sdBox(p, vec3(0.5,0.5,d1));
+        return min(b1, min(b2, b3));
     }
 
-    float sdTorus( vec3 p, vec2 t ){
-      vec2 q = vec2(length(p.xz)-t.x,p.y);
-      return length(q)-t.y;
+    // pseudo rando number between 0 and 1
+    float hash31(vec3 p){
+        p = fract(p*vec3(123.324, 213.354,356.125));
+        p+=dot(p,p+231.123);
+        return fract(p.x*p.y*p.z);
     }
-
-
     //--------------------------------------------------
 
-    //--------------------------------------------------
-    // GLSL 2D ROTATION
-    //--------------------------------------------------  
-vec2 rotate(vec2 v, float a) {
-	float s = sin(a);
-	float c = cos(a);
-	mat2 m = mat2(c, s, -s, c);
-	return m * v;
+mat2 rotation(float theta) {
+    return mat2(cos(theta), -sin(theta), sin(theta), cos(theta));
 }
-
-mat2 rotate2D(float angle) {
-    float s = sin(angle);
-    float c = cos(angle);
-    return mat2(c, -s, s, c);
-}
-    //--------------------------------------------------
-
     //--------------------------------------------------
     // RAYMARCH SCENE - RENDER LOGIC
     //--------------------------------------------------  
     float sdScene(vec3 p){
-        vec3 q = p;
-        vec3 qr = p;
+        p.yz -=  mod(uTime, 3.);
+        // p.yz *=rotation(reset);
+        // vec3 id = floor(p);
+        // float n = hash31(id);
+        p = repeat(p, 3.);
+        // p.yz *=rotation(reset*0.5);
+        // p.yx *= rotation(cos(uTime*.5 ) -.5);
+        // p.z -= mod(uTime/30.,3.);
+        // p.x +=cos(uTime);
         
-        float plane = q.y + sin(q.z *0.25) + sin(q.x*0.25);
-        float s = sdSphere(p - vec3(cos(uTime),1.,sin(uTime)), 1.);
-
-        // shadow on these shapes have some artefacts
-        // float b = sdBox(p - vec3(-4.,sin(uTime + 2.),0.), vec3(1.,3.,1.));
-        // float oct = sdOctahedron(p - vec3(0.,6.,0.), 1.);
-        // // float r = min(plane, min(s,min(tr, oct) ));
-        // float r = min(plane,min(s,min(b,oct)));
-        float r = min(plane, s);
-
-        return r;
+        // p.yx *= rotation(sin(uTime*.5) -0.5);
+    
+        float l = mix(1.20,1.6, sin(uTime));
+  
+        float render = sdCross(p, l, 0.5);
+        float b = sdBox(p, vec3(.7));
+        render = min(render,b);
+        return render;
     }
     //--------------------------------------------------
 
@@ -137,6 +126,14 @@ mat2 rotate2D(float angle) {
     }
     //--------------------------------------------------
 
+    //--------------------------------------------------
+    // CALC COLOR PALETTE 
+    // https://iquilezles.org/articles/palettes/
+    //-------------------------------------------------- 
+    vec3 palette( in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d ){
+        return a + b*cos( 6.28318*(c*t+d) );
+    }
+    //--------------------------------------------------
 
     //--------------------------------------------------
     // RENDER
@@ -147,22 +144,20 @@ mat2 rotate2D(float angle) {
         newUv -= 0.5;
         newUv.x *= uResolution.x / uResolution.y;
         // ---------------------------------------------
-
+        // float reset = mod(uTime, 10.);
         // ray origin = camera position ----------------
-        vec3 rayOrigin = vec3(-2,4,8);
+        vec3 rayOrigin = vec3(0.,0.,0.);
         vec3 rayDir = normalize(vec3(newUv,-.5));
         // ---------------------------------------------
 
         // calc dist / dir from the origin -------------
         float dist = raymarch(rayOrigin, rayDir);
-        vec3 p = rayOrigin + rayDir * dist;
+        vec3 p = rayOrigin + rayDir * dist ;
+
         // ---------------------------------------------
 
-
         // light position-------------------------------
-        vec3 lightPos = vec3(-2, 5, 2);
-        lightPos.xz += vec2(cos(uTime), sin(uTime)) * 10.;
-
+        vec3 lightPos = vec3(0, 1.5, 3);
         // --------------------------------------------- 
         
         vec3 color = vec3(0.);
@@ -171,16 +166,18 @@ mat2 rotate2D(float angle) {
         if(dist < MAX_DIST){ 
             vec3 nPos = getNormal(p);
             vec3 lightDir = normalize(lightPos - rayDir);
+            // lightDir.z *= (sin(uTime) *0.5) -0.5;
             
-            float b = mix(0.5,0.95, sin(uTime*0.5));
-            color = vec3(.1,0.5,b); // light colors
-
+            color = vec3(1.)   ; // light colors
+            
             float diffuse = max(dot(nPos, lightDir),0.);
-            color*= diffuse; // light diffuse
+            color*= diffuse  ; // light diffuse
 
-            float k = 32.; 
-            float shadows = softShadow(p, lightDir, 0.01, k); 
-            color *= shadows;
+            // float k = 32.; 
+            // float shadows = softShadow(p, lightDir, 0.01, k); 
+            // color *= shadows;0.8, 0.5, 0.4		0.2, 0.4, 0.2	2.0, 1.0, 1.0	0.00, 0.25, 0.25
+            vec3 c = palette(diffuse , vec3(0.75),vec3(0.45),vec3(.75),vec3(0.75, 0.5, 0.40));
+            color += c;
 
             // to limit light -------------------------
             float falloff = min(1.,1./length(p.xz));
@@ -189,23 +186,60 @@ mat2 rotate2D(float angle) {
             float distToLight = length(lightPos - p);
             color /= distToLight * distToLight;
             
-            float lightStr = 10.;
+            float lightStr = 15.;
             color *=lightStr;
             // ----------------------------------------
         };
         // ---------------------------------------------
-
+        // float lightCenter = length(newUv);
+        // color += 1.-lightCenter;
         //gamma correction------------------------------
-        color = pow(color, vec3(0.4545));
+        color = pow(color, vec3(0.65));
         //----------------------------------------------
+        
         gl_FragColor = vec4(color,1.);
-
     }
 `;
-// float bounceLight = 0.5-0.5*nPos.y;
-// float back = max(dot(-nPos, lightDir),0.);
 
-// color += .25*vec3(1,.8,.6) * 1.*(.5+back)*bounceLight; // indirect light
-// color += .2*vec3(.3,.6,1); // sky light
-// color += 1.5*color / (1.+color);
-// color = mix(color, vec3(0.),1.- exp(maxDist * -maxDist * 0.02) );
+// rayOrigin.z -= reset;
+// vec3 camPos = rayOrigin;
+// vec3 camDir =normalize(vec3(0.,0.,1.));
+// vec3 camUp = vec3(sin(uTime),0.,0.);
+// vec3 camSide = cross(camDir, camUp);
+// rayOrigin.z -= sin(uTime*4.);
+// vec3 rayDir = normalize(vec3(camSide *newUv.x + camUp* newUv.y + camDir));
+// rayDir.z *=reset *0.5 - 0.5;
+// rayDir.xy *= rotation(sin(uTime*0.5) -.5);
+// rayDir.x +=cos(uTime*0.5);(sin(uTime*.5) *0.5) -0.5
+// vec3 qmod = mod(p,c ) -0.5*c;
+// float b =repeatedBox(p, vec3(1.),.075,.025);
+// float b = sdBox(qmod, vec3(1.));
+
+// float limit = -sdSphere(p, 50.);
+// b=min(b, grid);
+// float s = sdSphere(q, 0.5);
+// float r = min(grid, -b);
+// vec3 q = p;
+// vec3 c = vec3(15.);
+// vec3 dim = vec3(0.3,0.25,0.2);
+
+// float grid = abs(p.y) -0.01;
+// vec2 id = floor(q.xz);
+
+// q.xz = fract(q.xz)-0.5;
+
+// // vec3 qmod = mod(p,c ) -0.5*c;
+
+// float n = hash21(id);
+// // if(n<0.5) dim.y += abs(n) * 0.1;
+
+// // float s = q.x > q.z ? .5:-.5;
+// // q.xz += 0.5 * s;
+
+// float b = sdBox(q, vec3(0.49));
+
+// float render = max(grid, -sdBox(q, vec3(0.49)));
+// render = min(-b, render);
+
+// // r=min(b, s);
+// // r = repeat(p, r);

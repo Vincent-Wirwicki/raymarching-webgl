@@ -1,6 +1,7 @@
-import BasicTransformRayScene from "./raymarch/basic/1-transform/BasicTransformRayScene";
-import BasicDisplaceRayScene from "./raymarch/basic/2-displace/BasicDisplaceRayScene";
-import BasicShadowsRayScene from "./raymarch/basic/3-shadows/BasicShadowsRayScene";
+import BasicTransformRayScene from "./raymarch/2-basic/1-transform/BasicTransformRayScene";
+import BasicDisplaceRayScene from "./raymarch/2-basic/2-displace/BasicDisplaceRayScene";
+import BasicShadowsRayScene from "./raymarch/2-basic/3-shadows/BasicShadowsRayScene";
+import BasicInfiniteRayScene from "./raymarch/2-basic/4-infinite/BasicInfiniteRayScene";
 import HomePage from "./pages/home/HomePage";
 import { Route, Routes } from "react-router-dom";
 import Layout from "./layout/Layout";
@@ -16,6 +17,7 @@ const App = () => {
           <Route path="/basic/transform" element={<BasicTransformRayScene />} />
           <Route path="/basic/displace" element={<BasicDisplaceRayScene />} />
           <Route path="/basic/shadows" element={<BasicShadowsRayScene />} />
+          <Route path="/basic/infinit" element={<BasicInfiniteRayScene />} />
         </Route>
       </Routes>
     </>

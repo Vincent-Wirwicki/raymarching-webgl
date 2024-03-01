@@ -1,4 +1,4 @@
-import HomeRayScene from "../../raymarch/home/HomeRayScene";
+import HomeRayScene from "../../raymarch/0-home/HomeRayScene";
 
 const HomePage = () => {
   return (

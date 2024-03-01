@@ -77,11 +77,11 @@ export const basicDisplaceFragment = /* glsl */ `
         float noisy = noise(pos.zyy   + uTime *0.5);
         float noisy2 = noise(vec3(pos.yyx + uTime *0.25)) ;
 
-        float sphere =  sdSphere(pos + vec3(1. -cos(noisy2 *1.75 )  ,1.- sin(noisy * 1.75), 0. ), radius);
+        float sphere =  sdSphere(pos + vec3(1. -sin(noisy2 *1.75 )  ,1.- sin(noisy * 1.75), 0. ) + noisy, radius);
 
-        float sphere2 = sdSphere(pos + vec3(cos(noisy *2.25), sin(2.25 * noisy2), 0. ), radius);
+        float sphere2 = sdSphere(pos + vec3(cos(noisy *2.25), cos(2.25 * noisy2), 0. ), radius);
 
-        float sphere3 = sdSphere(pos + vec3(cos(noisy2 * 2.), sin(noisy *2.) , 0.), radius); 
+        float sphere3 = sdSphere(pos + vec3(sin(noisy2 * 2.), sin(noisy *2.) , 0.), radius); 
 
         float sphere4 = sdSphere(pos + vec3(1.-cos(noisy *2.5 ),1.- sin(noisy2 *2.5), 0.), radius);
 
@@ -160,9 +160,15 @@ export const basicDisplaceFragment = /* glsl */ `
         //if ray hit-----------------------------------
         if(dist < MAX_DIST){ 
             vec3 nPos = getNormal(p);
+            color +=nPos;
+            float n = noise(nPos + uTime*.25);
+            color += n;
             vec3 lightDir = normalize(lightPos - nPos);
             float diffuse = max(dot(nPos, lightDir),0.);
-            color = vec3(nPos) *diffuse   ;
+            color *= diffuse;
+            // color += nPos;
+            // color +=n;
+            // color = vec3(nPos) *diffuse * n   ;
         };
         // ---------------------------------------------
 
