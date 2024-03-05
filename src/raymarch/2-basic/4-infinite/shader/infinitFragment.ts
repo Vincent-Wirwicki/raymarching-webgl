@@ -52,16 +52,9 @@ mat2 rotation(float theta) {
     //--------------------------------------------------  
     float sdScene(vec3 p){
         p.yz -=  mod(uTime, 3.);
-        // p.yz *=rotation(reset);
-        // vec3 id = floor(p);
-        // float n = hash31(id);
+
         p = repeat(p, 3.);
-        // p.yz *=rotation(reset*0.5);
-        // p.yx *= rotation(cos(uTime*.5 ) -.5);
-        // p.z -= mod(uTime/30.,3.);
-        // p.x +=cos(uTime);
-        
-        // p.yx *= rotation(sin(uTime*.5) -0.5);
+
     
         float l = mix(1.20,1.6, sin(uTime));
   
@@ -168,8 +161,8 @@ mat2 rotation(float theta) {
             vec3 lightDir = normalize(lightPos - rayDir);
             // lightDir.z *= (sin(uTime) *0.5) -0.5;
             
-            color = vec3(1.)   ; // light colors
-            
+            color = vec3(1.); // light colors
+
             float diffuse = max(dot(nPos, lightDir),0.);
             color*= diffuse  ; // light diffuse
 
@@ -201,6 +194,16 @@ mat2 rotation(float theta) {
     }
 `;
 
+// old stuff i tried
+// p.yz *=rotation(reset);
+// vec3 id = floor(p);
+// float n = hash31(id);
+// p.yz *=rotation(reset*0.5);
+// p.yx *= rotation(cos(uTime*.5 ) -.5);
+// p.z -= mod(uTime/30.,3.);
+// p.x +=cos(uTime);
+
+// p.yx *= rotation(sin(uTime*.5) -0.5);
 // rayOrigin.z -= reset;
 // vec3 camPos = rayOrigin;
 // vec3 camDir =normalize(vec3(0.,0.,1.));
