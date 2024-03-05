@@ -1,27 +1,26 @@
-import BasicTransformRayScene from "./raymarch/2-basic/1-transform/BasicTransformRayScene";
-import BasicDisplaceRayScene from "./raymarch/2-basic/2-displace/BasicDisplaceRayScene";
-import BasicShadowsRayScene from "./raymarch/2-basic/3-shadows/BasicShadowsRayScene";
-import BasicInfiniteRayScene from "./raymarch/2-basic/4-infinite/BasicInfiniteRayScene";
-import HomePage from "./pages/home/HomePage";
-import { Route, Routes } from "react-router-dom";
 import Layout from "./layout/Layout";
-import BasicsPage from "./pages/basic/BasicsPage";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import HomePage from "./pages/0-home/HomePage";
+
+import useRouteBasicPage from "./pages/1-basic/useRoutingBasicPage";
+import useRouteInfinitPage from "./pages/2-infinit/useRouteInfinitPage";
 
 const App = () => {
-  return (
-    <>
-      <Layout />
-      <Routes>
-        <Route index element={<HomePage />} />
-        <Route path="/basic" element={<BasicsPage />}>
-          <Route path="/basic/transform" element={<BasicTransformRayScene />} />
-          <Route path="/basic/displace" element={<BasicDisplaceRayScene />} />
-          <Route path="/basic/shadows" element={<BasicShadowsRayScene />} />
-          <Route path="/basic/infinit" element={<BasicInfiniteRayScene />} />
-        </Route>
-      </Routes>
-    </>
-  );
+  const basicPageRouting = useRouteBasicPage();
+  const infinitPageRouting = useRouteInfinitPage();
+
+  const router = createBrowserRouter([
+    {
+      element: <Layout />,
+      children: [
+        { path: "/", element: <HomePage /> },
+        { ...basicPageRouting },
+        { ...infinitPageRouting },
+      ],
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
 };
 
 export default App;

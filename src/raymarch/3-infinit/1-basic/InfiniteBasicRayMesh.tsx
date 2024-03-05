@@ -6,7 +6,7 @@ import { vertex } from "../../1-utis/vertex";
 import { infinitFragment } from "./shader/infinitFragment";
 import { useAspect } from "@react-three/drei";
 
-const BasicInfiniteRayMesh = () => {
+const InfiniteBasicRayMesh = () => {
   const scale = useAspect(window.innerWidth, window.innerHeight, 1);
   const shaderRef = useRef<ShaderMaterial | null>(null);
 
@@ -49,4 +49,4 @@ const BasicInfiniteRayMesh = () => {
   );
 };
 
-export default BasicInfiniteRayMesh;
+export default InfiniteBasicRayMesh;
