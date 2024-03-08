@@ -4,7 +4,6 @@ import { navPaths } from "../../navPath";
 const MainNav = () => {
   const location = useLocation();
   const filter = location.pathname.split("/")[1];
-
   return (
     <nav className="nav nav-main">
       {navPaths.map(({ title, path }, i) => (
@@ -15,7 +14,7 @@ const MainNav = () => {
           style={{
             color:
               title === filter || (title === "home" && filter === "")
-                ? "#3b82f6"
+                ? "#ef4444"
                 : "#64748b",
           }}
         >

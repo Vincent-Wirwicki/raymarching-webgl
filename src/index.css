@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Carlito:ital,wght@0,400;0,700;1,400;1,700&family=Fragment+Mono:ital@0;1&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,13 +10,14 @@
   body {
     background-color: #0a0a0a;
     color: #fafafa;
+    font-family: "Fragment Mono", monospace;
   }
 }
 
 @layer components {
 
   .nav {
-    @apply h-fit w-fit border-b border-neutral-800 z-50 p-2 flex gap-5 font-bold
+    @apply h-fit w-fit z-50 p-2 flex gap-5 font-bold
   }
 
   .nav-main {
@@ -35,7 +37,7 @@
   }
 
   .page-home {
-    @apply flex justify-center items-center text-neutral-800
+    @apply fixed top-0 left-0 z-20 w-screen h-screen flex justify-center items-center text-neutral-800 mix-blend-multiply
   }
 
   .canvas {

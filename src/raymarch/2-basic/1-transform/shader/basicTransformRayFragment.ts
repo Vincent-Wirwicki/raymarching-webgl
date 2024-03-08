@@ -135,7 +135,7 @@ export const basicTransformRayFragment = /* glsl */ `
         
         float s = sdSphere(p,1.) + displacement;
         
-        float b1 = sdBox(q, vec3(.5)) ;
+        float b1 = sdBox(q , vec3(.5)) ;
         float b2 = sdBox(q - vec3(cos(uTime), sin(uTime),0.) , vec3(0.4));
         float s2 = sdSphere(q - vec3(cos(uTime),0.,0.),  0.4);
         

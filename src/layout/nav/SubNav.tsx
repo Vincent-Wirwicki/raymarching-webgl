@@ -15,7 +15,7 @@ const SubNav: React.FC<Props> = ({ subNav }) => {
           className="link"
           style={({ isActive }) => {
             return {
-              color: isActive ? "#3b82f6" : "#64748b",
+              color: isActive ? "#ef4444" : "#64748b",
             };
           }}
         >

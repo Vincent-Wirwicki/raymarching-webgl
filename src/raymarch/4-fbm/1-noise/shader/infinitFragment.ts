@@ -1,6 +1,7 @@
 // details here => https://iquilezles.org/articles/menger/
 
-export const defaultFragment = /* glsl */ `    
+export const infinitFragment = /* glsl */ `
+     
     uniform float uTime;
     uniform vec2 uResolution;
     varying vec2 vUv;
@@ -43,9 +44,9 @@ export const defaultFragment = /* glsl */ `
     }
     //--------------------------------------------------
 
-    mat2 rotation(float theta) {
-        return mat2(cos(theta), -sin(theta), sin(theta), cos(theta));
-    }
+mat2 rotation(float theta) {
+    return mat2(cos(theta), -sin(theta), sin(theta), cos(theta));
+}
     //--------------------------------------------------
     // RAYMARCH SCENE - RENDER LOGIC
     //--------------------------------------------------  
@@ -54,6 +55,7 @@ export const defaultFragment = /* glsl */ `
 
         p = repeat(p, 3.);
 
+    
         float l = mix(1.20,1.6, sin(uTime));
   
         float render = sdCross(p, l, 0.5);
@@ -191,3 +193,56 @@ export const defaultFragment = /* glsl */ `
         gl_FragColor = vec4(color,1.);
     }
 `;
+
+// old stuff i tried
+// p.yz *=rotation(reset);
+// vec3 id = floor(p);
+// float n = hash31(id);
+// p.yz *=rotation(reset*0.5);
+// p.yx *= rotation(cos(uTime*.5 ) -.5);
+// p.z -= mod(uTime/30.,3.);
+// p.x +=cos(uTime);
+
+// p.yx *= rotation(sin(uTime*.5) -0.5);
+// rayOrigin.z -= reset;
+// vec3 camPos = rayOrigin;
+// vec3 camDir =normalize(vec3(0.,0.,1.));
+// vec3 camUp = vec3(sin(uTime),0.,0.);
+// vec3 camSide = cross(camDir, camUp);
+// rayOrigin.z -= sin(uTime*4.);
+// vec3 rayDir = normalize(vec3(camSide *newUv.x + camUp* newUv.y + camDir));
+// rayDir.z *=reset *0.5 - 0.5;
+// rayDir.xy *= rotation(sin(uTime*0.5) -.5);
+// rayDir.x +=cos(uTime*0.5);(sin(uTime*.5) *0.5) -0.5
+// vec3 qmod = mod(p,c ) -0.5*c;
+// float b =repeatedBox(p, vec3(1.),.075,.025);
+// float b = sdBox(qmod, vec3(1.));
+
+// float limit = -sdSphere(p, 50.);
+// b=min(b, grid);
+// float s = sdSphere(q, 0.5);
+// float r = min(grid, -b);
+// vec3 q = p;
+// vec3 c = vec3(15.);
+// vec3 dim = vec3(0.3,0.25,0.2);
+
+// float grid = abs(p.y) -0.01;
+// vec2 id = floor(q.xz);
+
+// q.xz = fract(q.xz)-0.5;
+
+// // vec3 qmod = mod(p,c ) -0.5*c;
+
+// float n = hash21(id);
+// // if(n<0.5) dim.y += abs(n) * 0.1;
+
+// // float s = q.x > q.z ? .5:-.5;
+// // q.xz += 0.5 * s;
+
+// float b = sdBox(q, vec3(0.49));
+
+// float render = max(grid, -sdBox(q, vec3(0.49)));
+// render = min(-b, render);
+
+// // r=min(b, s);
+// // r = repeat(p, r);

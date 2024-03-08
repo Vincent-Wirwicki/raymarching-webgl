@@ -2,11 +2,11 @@ import { useMemo, useRef } from "react";
 import { ShaderMaterial, Vector2 } from "three";
 import { useFrame } from "@react-three/fiber";
 
-import { vertex } from "../1-utis/vertex";
-import { defaultFragment } from "./shader/defaultFragment";
+import { vertex } from "../../1-utis/vertex";
+import { infinitFragment } from "./shader/infinitFragment";
 import { useAspect } from "@react-three/drei";
 
-const DefaultShaderMesh = () => {
+const InfiniteBasicRayMesh = () => {
   const scale = useAspect(window.innerWidth, window.innerHeight, 1);
   const shaderRef = useRef<ShaderMaterial | null>(null);
 
@@ -20,7 +20,7 @@ const DefaultShaderMesh = () => {
         },
       },
       vertex: vertex,
-      fragment: defaultFragment,
+      fragment: infinitFragment,
     }),
     []
   );
@@ -28,8 +28,6 @@ const DefaultShaderMesh = () => {
   useFrame(({ clock }) => {
     if (shaderRef.current) {
       shaderRef.current.uniforms.uTime.value = clock.getElapsedTime();
-      // shaderRef.current.uniforms.uResolution.value.x = window.innerWidth;
-      // shaderRef.current.uniforms.uResolution.value.y = window.innerHeight;
       shaderRef.current.uniforms.uResolution.value = new Vector2(
         window.innerWidth,
         window.innerHeight
@@ -51,4 +49,4 @@ const DefaultShaderMesh = () => {
   );
 };
 
-export default DefaultShaderMesh;
+export default InfiniteBasicRayMesh;

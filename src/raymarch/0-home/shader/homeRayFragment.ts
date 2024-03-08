@@ -27,6 +27,7 @@ export const homeRayFragment = /* glsl */ `
         return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
     }
 
+
     //--------------------------------------------------
 
 
@@ -57,9 +58,11 @@ export const homeRayFragment = /* glsl */ `
     //--------------------------------------------------  
     float scene(vec3 p){
 
-        float s = sdSphere(p-vec3(0.,sin(uTime),0.), 1.5);
-        float b = sdBox(p - vec3(sin(uTime), 0.,0.), vec3(1.));
-        float d = smoothmin(s, b,0.5);
+        float s = sdSphere(p - vec3(sin(uTime *2. +.5) +0.5,0.5,0.), 1.);
+        float s1 = sdSphere(p - vec3(1.-sin(uTime *2. +0.95),0.5,0.), 1.);
+        // float b = sdBox(p - vec3(.75, 0.5,0.), vec3(.5,2.,0.5));
+        float d = smoothmin(s, s1, 0.75);
+
         return d;
     }
     //--------------------------------------------------
@@ -101,26 +104,6 @@ export const homeRayFragment = /* glsl */ `
     //--------------------------------------------------  
 
     //--------------------------------------------------
-    // CALC SOFT SHADOWS 
-    // https://iquilezles.org/articles/rmshadows/
-    //--------------------------------------------------  
-    float softshadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k ){
-        float res = 1.0;
-        float t = mint;
-        for( int i=0; i<256 && t<maxt; i++ )
-        {
-            float h = scene(ro + rd*t);
-            if( h<0.001 )
-                return 0.0;
-            res = min( res, k*h/t );
-            t += h;
-        }
-        return res;
-    }
-    //--------------------------------------------------
-
-
-    //--------------------------------------------------
     // CALC COLOR PALETTE 
     // https://iquilezles.org/articles/palettes/
     //-------------------------------------------------- 
@@ -156,7 +139,7 @@ export const homeRayFragment = /* glsl */ `
         // ---------------------------------------------
 
         
-        vec3 color = vec3(0., 0., 0.);
+        vec3 color = vec3(0.);
 
         //if ray hit-----------------------------------
         if(dist < MAX_DIST){ 
@@ -165,12 +148,8 @@ export const homeRayFragment = /* glsl */ `
 
             float diffuse = max(dot(n, lightDir),0.);
             
-            float shadows = softshadow(p, lightDir, 0.1, .5,64.);
-            vec3 c = palette( diffuse, vec3(0.5), vec3(0.5), vec3(0.5), vec3(0.5));
-
-            color = c  * diffuse;
-           
-
+            color = palette(diffuse, vec3(0.5), vec3(0.5), vec3(0.5), vec3(0.5));
+                       
         };
         // ---------------------------------------------
 

@@ -136,6 +136,7 @@ mat2 rotation(float theta) {
         vec2 newUv = (gl_FragCoord.xy/uResolution.xy);
         newUv -= 0.5;
         newUv.x *= uResolution.x / uResolution.y;
+        // newUv = floor(vUv *10.)/10.;
         // ---------------------------------------------
         // float reset = mod(uTime, 10.);
         // ray origin = camera position ----------------
