@@ -1,6 +1,6 @@
 // details here => https://iquilezles.org/articles/menger/
 
-export const infinitFragment = /* glsl */ `
+export const infinitTunnelsFragment = /* glsl */ `
      
     uniform float uTime;
     uniform vec2 uResolution;
@@ -29,38 +29,28 @@ export const infinitFragment = /* glsl */ `
         return mod(p,c) - 0.5 * c; // (0.5 *c centers the tiling around the origin)
     }
 
-    float sdCross (vec3 p, float d1, float d2 ){
-        float b1 = sdBox(p, vec3(0.8,0.5,.5));
-        float b2 = sdBox(p, vec3(0.5,d1,0.5));
-        float b3 = sdBox(p, vec3(0.5,0.5,d1));
-        return min(b1, min(b2, b3));
-    }
-
     // pseudo rando number between 0 and 1
     float hash31(vec3 p){
-        p = fract(p*vec3(123.324, 213.354, 356.125));
+        p = fract(p*vec3(123.324, 213.354,356.125));
         p+=dot(p,p+231.123);
         return fract(p.x*p.y*p.z);
     }
     //--------------------------------------------------
-
-mat2 rotation(float theta) {
-    return mat2(cos(theta), -sin(theta), sin(theta), cos(theta));
-}
+    
+    mat2 rotation(float theta) {
+        return mat2(cos(theta), -sin(theta), sin(theta), cos(theta));
+    }
     //--------------------------------------------------
     // RAYMARCH SCENE - RENDER LOGIC
     //--------------------------------------------------  
     float sdScene(vec3 p){
-        p.yz -=  mod(uTime, 3.);
-
+        p.xz *= rotation(p.y * 0.6);
+        p.z -=  mod(uTime, 3.);
+        // p = abs(p);
         p = repeat(p, 3.);
-    
-        float l = mix(1.2,1.6, sin(uTime));
-  
-        float render = sdCross(p, l, 0.5);
-        float b = sdBox(p, vec3(.7));
-        render = min(render,b);
-        return render;
+        // float r = mix(1.8,2.,sin(uTime));
+        float s = sdSphere(p, 2.);
+        return s;
     }
     //--------------------------------------------------
 
@@ -135,11 +125,13 @@ mat2 rotation(float theta) {
         vec2 newUv = (gl_FragCoord.xy/uResolution.xy);
         newUv -= 0.5;
         newUv.x *= uResolution.x / uResolution.y;
+        // newUv = floor(vUv *10.)/10.;
         // ---------------------------------------------
-        // float reset = mod(uTime, 10.);
+        float reset = mod(uTime, 3.);
         // ray origin = camera position ----------------
         vec3 rayOrigin = vec3(0.,0.,0.);
         vec3 rayDir = normalize(vec3(newUv,-.5));
+        // rayDir.xz *= rotation(rayOrigin.x * sin(uTime));
         // ---------------------------------------------
 
         // calc dist / dir from the origin -------------
@@ -149,7 +141,7 @@ mat2 rotation(float theta) {
         // ---------------------------------------------
 
         // light position-------------------------------
-        vec3 lightPos = vec3(0, 1.5, 3);
+        vec3 lightPos = vec3(0, 0, 5);
         // --------------------------------------------- 
         
         vec3 color = vec3(0.);
@@ -159,8 +151,9 @@ mat2 rotation(float theta) {
             vec3 nPos = getNormal(p);
             vec3 lightDir = normalize(lightPos - rayDir);
             // lightDir.z *= (sin(uTime) *0.5) -0.5;
-            
-            color = vec3(1.); // light colors
+            // color -= nPos;
+            // color = vec3(1.); 
+            // light colors
 
             float diffuse = max(dot(nPos, lightDir),0.);
             color*= diffuse  ; // light diffuse
@@ -168,7 +161,7 @@ mat2 rotation(float theta) {
             // float k = 32.; 
             // float shadows = softShadow(p, lightDir, 0.01, k); 
             // color *= shadows;0.8, 0.5, 0.4		0.2, 0.4, 0.2	2.0, 1.0, 1.0	0.00, 0.25, 0.25
-            vec3 c = palette(diffuse , vec3(0.75),vec3(0.45),vec3(.75),vec3(0.75, 0.5, 0.40));
+            vec3 c = palette(diffuse , vec3(0.75),vec3(0.45),vec3(.75),vec3(0.5, 0.5, 0.5));
             color += c;
 
             // to limit light -------------------------
@@ -178,7 +171,7 @@ mat2 rotation(float theta) {
             float distToLight = length(lightPos - p);
             color /= distToLight * distToLight;
             
-            float lightStr = 15.;
+            float lightStr = 5.;
             color *=lightStr;
             // ----------------------------------------
         };

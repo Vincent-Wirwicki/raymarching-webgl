@@ -4,6 +4,7 @@ import { navPaths } from "../../navPath";
 const MainNav = () => {
   const location = useLocation();
   const filter = location.pathname.split("/")[1];
+  
   return (
     <nav className="nav nav-main">
       {navPaths.map(({ title, path }, i) => (

@@ -10,4 +10,7 @@ export const navPathBasics = [
   { title: "shadows", path: "/basic/shadows" },
 ];
 
-export const navPathInfinit = [{ title: "basic", path: "/infinite/basic" }];
+export const navPathInfinit = [
+  { title: "basic", path: "/infinite/basic" },
+  { title: "tunnels", path: "/infinite/tunnels" },
+];

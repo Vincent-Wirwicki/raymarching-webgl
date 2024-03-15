@@ -38,7 +38,7 @@ export const infinitFragment = /* glsl */ `
 
     // pseudo rando number between 0 and 1
     float hash31(vec3 p){
-        p = fract(p*vec3(123.324, 213.354, 356.125));
+        p = fract(p*vec3(123.324, 213.354,356.125));
         p+=dot(p,p+231.123);
         return fract(p.x*p.y*p.z);
     }
@@ -54,8 +54,9 @@ mat2 rotation(float theta) {
         p.yz -=  mod(uTime, 3.);
 
         p = repeat(p, 3.);
+
     
-        float l = mix(1.2,1.6, sin(uTime));
+        float l = mix(1.20,1.6, sin(uTime));
   
         float render = sdCross(p, l, 0.5);
         float b = sdBox(p, vec3(.7));
@@ -135,6 +136,7 @@ mat2 rotation(float theta) {
         vec2 newUv = (gl_FragCoord.xy/uResolution.xy);
         newUv -= 0.5;
         newUv.x *= uResolution.x / uResolution.y;
+        // newUv = floor(vUv *10.)/10.;
         // ---------------------------------------------
         // float reset = mod(uTime, 10.);
         // ray origin = camera position ----------------
