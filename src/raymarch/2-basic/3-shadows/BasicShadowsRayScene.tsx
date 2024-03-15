@@ -1,13 +1,14 @@
+import { lazy, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import DefaultShaderMesh from "./BasicShadowsRayMesh";
+const DefaultShaderMesh = lazy(() => import("./BasicShadowsRayMesh"));
 
 const BasicShadowsRayScene = () => {
   return (
-    <Canvas>
-      <DefaultShaderMesh />
-      <OrbitControls />
-    </Canvas>
+    <Suspense fallback={null}>
+      <Canvas>
+        <DefaultShaderMesh />
+      </Canvas>
+    </Suspense>
   );
 };
 

@@ -1,13 +1,15 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import InfiniteBasicRayMesh from "./InfiniteBasicRayMesh";
+import { lazy, Suspense } from "react";
+
+const InfiniteBasicRayMesh = lazy(() => import("./InfiniteBasicRayMesh"));
 
 const InfiniteBasicRayScene = () => {
   return (
-    <Canvas>
-      <InfiniteBasicRayMesh />
-      <OrbitControls />
-    </Canvas>
+    <Suspense fallback={null}>
+      <Canvas>
+        <InfiniteBasicRayMesh />
+      </Canvas>
+    </Suspense>
   );
 };
 
