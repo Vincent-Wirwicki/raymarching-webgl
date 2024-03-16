@@ -119,28 +119,23 @@ export const basicDisplaceFragment = /* glsl */ `
     // RAYMARCH SCENE - RENDER LOGIC
     //-------------------------------------------------- 
     float sdScene(vec3 pos){
-        // float d = sdSphere(pos-vec3(0.0, 0.0, 1.0), 3.0);
-        // float time = sin(time) + cos(uTime);
-        // float displacement = sin(5.0 * pos.x) * sin(5.0 * pos.y) * sin(5.0 * pos.z) * 1.5;  - vec3(noisy * cos( uTime),noisy + 0.25 * sin(uTime),0.)
+        
         float radius = 0.5;
-        float noisy = cnoise((pos.xxz - 0.25) *0.25  + cos(uTime *.5));
-        float noisy2 = cnoise(vec3(pos.yyx + uTime *0.25)) ;
+        
+        float displace = cnoise((pos.yxz *2.15 - 0.25) *0.25  + cos(uTime *.5));
+        float displace2 = cnoise((pos.zxx *1.15 + sin(uTime *0.5))) ;
+        float d = displace * displace2;
 
-        float sphere =  sdSphere(pos, radius);
-        sphere += noisy * noisy2 ;
+        float sphere =  sdSphere(pos +  vec3(cos(uTime * 1.5 + 0.25),sin(uTime *0.75),0.), radius);
 
-        float sphere2 = sdSphere(pos + vec3(0.75,0.75,0.), radius);
-        sphere2 += noisy * noisy2;
+        float sphere2 = sdSphere(pos + vec3(sin(uTime *0.75 +0.75), cos(uTime*1.5),0.), radius);
 
-        float sphere3 = sdSphere(pos + vec3(0.25,0.5,0.), radius);
-        // sphere3 += noisy;
+        float sphere3 = sdSphere(pos + vec3(0.25,0.75,0.), radius);
 
-        // float fixSphere = smoothmin(sphere2, sphere3,0.4);
-
-        // sphere2 -= noisy;
         float render1 = smoothmin(sphere, sphere2 , 0.6);
+        render1 += d;
 
-        float render2 = smoothmin(render1, sphere3 , 0.6);
+        float render2 = smoothmin(render1, sphere3 , 0.75);
         // render1 +=noisy *0.25;
     
         return render2;
@@ -197,7 +192,7 @@ export const basicDisplaceFragment = /* glsl */ `
 
         // ray origin = camera position ----------------
         vec3 rayOrigin = vec3(-0.5,-1.,2.);
-        vec3 rayDir = normalize(vec3(newUv,-.5));
+        vec3 rayDir = normalize(vec3(newUv,-.28));
         // ---------------------------------------------
 
         // calc dist / dir from the origin -------------
@@ -206,20 +201,20 @@ export const basicDisplaceFragment = /* glsl */ `
         // ---------------------------------------------
         
         // light position-------------------------------
-        vec3 lightPos = vec3( .5 ,0.5,5.);
+        vec3 lightPos = vec3(.5,.5,5.);
         // ---------------------------------------------
         
-        vec3 color = vec3(0., 0., 0.);
+        vec3 color = vec3(0.);
         
         //if ray hit-----------------------------------
         if(dist < MAX_DIST){ 
             vec3 nPos = getNormal(p);
-            // color +=nPos;
-            float n = cnoise(nPos + sin(uTime*0.25));
-            color += n;
             vec3 lightDir = normalize(lightPos - nPos);
+            
             float diffuse = max(dot(nPos, lightDir),0.);
             color *= diffuse ;
+            float n = cnoise(nPos * 1.25  + sin(uTime*0.5));
+            color -= n *2.;
 
         };
         // ---------------------------------------------
